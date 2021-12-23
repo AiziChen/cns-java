@@ -59,18 +59,18 @@ public class TCP {
             // starting forward
             new Thread(() -> {
                 try {
-                    tcpForward(channel, sChannel);
+                    tcpForward(sChannel, channel);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }).start();
-            tcpForward(sChannel, channel);
+            tcpForward(channel, sChannel);
         } catch (IOException ignore) {
-        }
-        try {
-            channel.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                channel.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
