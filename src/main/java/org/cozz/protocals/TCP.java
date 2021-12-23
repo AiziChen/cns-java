@@ -55,16 +55,15 @@ public class TCP {
                 desChannel.connect(new InetSocketAddress(hostPort[0], Integer.parseInt(hostPort[1])));
             }
             logger.info("Starting tcp forward");
-            final SocketChannel sChannel = desChannel;
             // starting forward
             new Thread(() -> {
                 try {
-                    tcpForward(sChannel, channel);
+                    tcpForward(desChannel, channel);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }).start();
-            tcpForward(channel, sChannel);
+            tcpForward(channel, desChannel);
         } catch (IOException ignore) {
             try {
                 channel.close();
@@ -76,12 +75,14 @@ public class TCP {
 
     private static void tcpForward(SocketChannel cChannel, SocketChannel dChannel) throws IOException {
         ByteBuffer buf = ByteBuffer.allocate(65536);
+        int subI = 0;
         while (true) {
             buf.clear();
-            int flag = cChannel.read(buf);
-            if (flag == -1) {
+            int bytesRead = cChannel.read(buf);
+            if (bytesRead == -1) {
                 break;
             }
+            subI = Cipher.xorCrypt(buf, subI);
             buf.flip();
             dChannel.write(buf);
         }
