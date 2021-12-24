@@ -82,13 +82,14 @@ public class TCP {
                 dChannel.write(buf);
             } catch (IOException e) {
                 e.printStackTrace();
-                try {
-                    cChannel.close();
-                    dChannel.close();
-                } catch (IOException ignore) {
-                }
-                return;
+                break;
             }
+        }
+        try {
+            cChannel.close();
+            dChannel.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
