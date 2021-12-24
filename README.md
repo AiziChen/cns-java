@@ -32,12 +32,12 @@ configuration arguments:
   (enableDnsOverUdp #t)
   (enableHttpDns #t))
 ```
-all the above configurations are written in `config.sobj` file on project folder.
+all the above configurations are written in `config.sobj` file on your project folder.
 if you do not have `config.sobj` file on your project folder, then `cns-java` program will load the default
 configuration file `default-config.sobj` in project's `src/main/resources` folder.
 
 ## Running on background
-if your computer system based on `linux`, then type it:
+if your computer system based on `linux`, then type:
 ```shell
 setsid nohup target/cns-java-xxx.jar > /dev/null
 ```
