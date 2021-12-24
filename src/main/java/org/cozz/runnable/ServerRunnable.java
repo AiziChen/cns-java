@@ -1,8 +1,8 @@
 package org.cozz.runnable;
 
+import org.cozz.Main;
 import org.cozz.protocals.TCP;
 import org.cozz.protocals.UDP;
-import org.cozz.record.Config;
 import org.cozz.tool.Common;
 import org.cozz.tool.Tools;
 
@@ -39,7 +39,7 @@ public class ServerRunnable implements Runnable {
                     sc.close();
                     return;
                 }
-                if (Tools.indexOf(data, Config.udpFlag) == -1) {
+                if (Tools.indexOf(data, Main.globalConfig.getUdpFlag()) == -1) {
                     TCP.handleTcpSession(sc, data);
                 }
             } else {

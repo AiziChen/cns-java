@@ -1,6 +1,6 @@
 package org.cozz.protocals;
 
-import org.cozz.record.Config;
+import org.cozz.Main;
 import org.cozz.tool.Cipher;
 
 import java.io.IOException;
@@ -14,12 +14,12 @@ import java.util.regex.Pattern;
 public class TCP {
 
     private static final Logger logger = Logger.getGlobal();
-    private static final Pattern PROXY_PATTERN = Pattern.compile(Config.proxyKey + ":\\s*(.*)\r");
+    private static final Pattern PROXY_PATTERN = Pattern.compile(Main.globalConfig.getProxyKey() + ":\\s*(.*)\r");
 
     private static String getProxyHost(byte[] data) {
         Matcher m = PROXY_PATTERN.matcher(new String(data));
         if (m.find()) {
-            return Config.password.isEmpty() ? m.group(1) : Cipher.decryptHost(m.group(1));
+            return Main.globalConfig.getPassword().isEmpty() ? m.group(1) : Cipher.decryptHost(m.group(1));
         } else {
             return "";
         }
@@ -56,37 +56,39 @@ public class TCP {
             }
             logger.info("Starting tcp forward");
             // starting forward
-            new Thread(() -> {
-                try {
-                    tcpForward(desChannel, channel);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }).start();
+            new Thread(() -> tcpForward(desChannel, channel)).start();
             tcpForward(channel, desChannel);
-        } catch (IOException ignore) {
+        } catch (IOException e) {
+            e.printStackTrace();
             try {
                 channel.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ignore) {
             }
         }
     }
 
-    private static void tcpForward(SocketChannel cChannel, SocketChannel dChannel) throws IOException {
+    private static void tcpForward(SocketChannel cChannel, SocketChannel dChannel) {
         ByteBuffer buf = ByteBuffer.allocate(65536);
         int subI = 0;
         while (true) {
             buf.clear();
-            int bytesRead = cChannel.read(buf);
-            if (bytesRead == -1) {
-                break;
+            try {
+                int bytesRead = cChannel.read(buf);
+                if (bytesRead == -1) {
+                    break;
+                }
+                subI = Cipher.xorCrypt(buf, subI);
+                buf.flip();
+                dChannel.write(buf);
+            } catch (IOException e) {
+                e.printStackTrace();
+                try {
+                    cChannel.close();
+                    dChannel.close();
+                } catch (IOException ignore) {
+                }
+                return;
             }
-            subI = Cipher.xorCrypt(buf, subI);
-            buf.flip();
-            dChannel.write(buf);
         }
-        cChannel.close();
-        dChannel.close();
     }
 }

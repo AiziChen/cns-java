@@ -1,0 +1,7 @@
+(*obj
+  (proxyKey "Meng")
+  (udpFlag "httpUDP")
+  (listenPorts (*list 1080 520))
+  (password "quanyec")
+  (enableDnsOverUdp #t)
+  (enableHttpDns #t))

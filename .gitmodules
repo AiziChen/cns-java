@@ -1,0 +1,3 @@
+[submodule "SObj-java"]
+	path = SObj-java
+	url = git@github.com:AiziChen/SObj-java.git
