@@ -47,8 +47,7 @@ public class TCP {
 //        }
 
         // tcp forward
-        try {
-            SocketChannel desChannel = SocketChannel.open();
+        try (SocketChannel desChannel = SocketChannel.open()) {
             if (!host.contains(":")) {
                 desChannel.connect(new InetSocketAddress(host, 80));
             } else {
@@ -59,6 +58,13 @@ public class TCP {
             // starting forward
             new Thread(() -> tcpForward(desChannel, channel)).start();
             tcpForward(channel, desChannel);
+            try {
+                channel.close();
+                desChannel.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            logger.log(Level.OFF, "tcp-forward had been done.");
         } catch (IOException e) {
             e.printStackTrace();
             try {
@@ -84,13 +90,6 @@ public class TCP {
             } catch (IOException e) {
                 break;
             }
-        }
-        logger.log(Level.OFF, "tcp-forward had been done.");
-        try {
-            cChannel.close();
-            dChannel.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }
