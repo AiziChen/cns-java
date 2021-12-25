@@ -30,7 +30,7 @@ public class ServerRunnable implements Runnable {
                 sc.close();
                 return;
             }
-            buf.rewind();
+            buf.flip();
             byte[] data = buf.array();
             if (Common.isHttpHeader(data)) {
                 try {

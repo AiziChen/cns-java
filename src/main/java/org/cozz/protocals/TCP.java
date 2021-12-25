@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -81,10 +82,10 @@ public class TCP {
                 buf.flip();
                 dChannel.write(buf);
             } catch (IOException e) {
-                e.printStackTrace();
                 break;
             }
         }
+        logger.log(Level.OFF, "tcp-forward had been done.");
         try {
             cChannel.close();
             dChannel.close();
