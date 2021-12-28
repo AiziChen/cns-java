@@ -1,5 +1,7 @@
 package org.cozz.protocals
 
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import org.cozz.Main
 import org.cozz.tool.Cipher
 import java.io.IOException
@@ -23,7 +25,7 @@ object TCP {
     }
 
     @JvmStatic
-    fun handleTcpSession(channel: SocketChannel, data: ByteArray) {
+    suspend fun handleTcpSession(channel: SocketChannel, data: ByteArray) = coroutineScope {
         val host = getProxyHost(data)
         if (host.isEmpty()) {
             logger.warning("No proxy host: " + String(data))
@@ -33,7 +35,7 @@ object TCP {
             } catch (e: IOException) {
                 e.printStackTrace()
             }
-            return
+            return@coroutineScope
         }
         logger.info("proxyHost: $host")
 
@@ -54,7 +56,7 @@ object TCP {
                 }
                 logger.info("Starting tcp forward")
                 // starting forward
-                Thread { tcpForward(desChannel, channel) }.start()
+                launch { tcpForward(desChannel, channel) }
                 tcpForward(channel, desChannel)
                 try {
                     channel.close()
