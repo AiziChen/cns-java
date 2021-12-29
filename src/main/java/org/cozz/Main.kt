@@ -44,15 +44,13 @@ class Main {
             launch {
                 logger.info("Listen to port $port successfully")
                 while (true) {
-                    val sc: SocketChannel? = try {
-                        ssc.accept()
+                    try {
+                        val sc = ssc.accept()
+                        logger.info("Handle a new connection...")
+                        launch { ServerRunnable().handleConnect(sc) }
                     } catch (e: IOException) {
                         logger.warning("new connection read failed")
-                        break
-                    }
-                    logger.info("Handle a new connection...")
-                    if (sc != null) {
-                        launch { ServerRunnable().handleConnect(sc) }
+                        continue
                     }
                 }
             }
@@ -67,8 +65,10 @@ class Main {
 }
 
 @Throws(IOException::class, InvalidSObjSyntaxException::class)
-suspend fun main(args: Array<String>) = coroutineScope {
+suspend fun main(args: Array<String>): Unit = coroutineScope {
     val m = Main()
     m.overrideConfig()
-    m.initListener()
+    launch {
+        m.initListener()
+    }
 }

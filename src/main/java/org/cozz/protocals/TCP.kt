@@ -52,7 +52,7 @@ object TCP {
                     desChannel.connect(InetSocketAddress(host, 80))
                 } else {
                     val hostPort = host.split(":").toTypedArray()
-                    desChannel.connect(InetSocketAddress(hostPort[0], hostPort[1].toInt()))
+                    desChannel.connect(InetSocketAddress(hostPort[0], hostPort[1].substring(0, hostPort[1].length - 1).toInt()))
                 }
                 logger.info("Starting tcp forward")
                 // starting forward
