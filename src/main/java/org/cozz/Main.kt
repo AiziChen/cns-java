@@ -9,7 +9,6 @@ import org.quanye.sobj.exception.InvalidSObjSyntaxException
 import java.io.*
 import java.net.InetSocketAddress
 import java.nio.channels.ServerSocketChannel
-import java.nio.channels.SocketChannel
 import java.util.logging.Logger
 
 class Main {
@@ -41,17 +40,15 @@ class Main {
             val ssc = ServerSocketChannel.open()
             ssc.configureBlocking(true)
             ssc.socket().bind(InetSocketAddress(Math.toIntExact(port)))
-            launch {
-                logger.info("Listen to port $port successfully")
-                while (true) {
-                    try {
-                        val sc = ssc.accept()
-                        logger.info("Handle a new connection...")
-                        launch { ServerRunnable().handleConnect(sc) }
-                    } catch (e: IOException) {
-                        logger.warning("new connection read failed")
-                        continue
-                    }
+            logger.info("Listen to port $port successfully")
+            while (true) {
+                try {
+                    val sc = ssc.accept()
+                    logger.info("Handle a new connection...")
+                    launch { ServerRunnable().handleConnect(sc) }
+                } catch (e: IOException) {
+                    logger.warning("new connection read failed")
+                    continue
                 }
             }
         }
@@ -59,16 +56,15 @@ class Main {
 
     companion object {
         private val logger = Logger.getGlobal()
+
         @JvmField
         var globalConfig: Config? = null
     }
 }
 
 @Throws(IOException::class, InvalidSObjSyntaxException::class)
-suspend fun main(args: Array<String>): Unit = coroutineScope {
+suspend fun main(args: Array<String>) {
     val m = Main()
     m.overrideConfig()
-    launch {
-        m.initListener()
-    }
+    m.initListener()
 }

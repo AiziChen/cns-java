@@ -1,6 +1,6 @@
 package org.cozz.runnable
 
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.runBlocking
 import org.cozz.Main
 import org.cozz.protocals.TCP.handleTcpSession
 import org.cozz.protocals.UDP
@@ -11,13 +11,13 @@ import java.nio.ByteBuffer
 import java.nio.channels.SocketChannel
 
 class ServerRunnable {
-    suspend fun handleConnect(sc: SocketChannel) = coroutineScope {
+    fun handleConnect(sc: SocketChannel) = runBlocking {
         val buf = ByteBuffer.allocate(65536)
         try {
             val bytesRead = sc.read(buf).toLong()
             if (bytesRead == -1L) {
                 sc.close()
-                return@coroutineScope
+                return@runBlocking
             }
             buf.flip()
             val data = buf.array()
@@ -26,7 +26,7 @@ class ServerRunnable {
                     sc.write(ByteBuffer.wrap(Common.responseHeader(data).toByteArray()))
                 } catch (ioe: IOException) {
                     sc.close()
-                    return@coroutineScope
+                    return@runBlocking
                 }
                 if (Tools.indexOf(data, Main.globalConfig!!.udpFlag) == -1) {
                     handleTcpSession(sc, data)
